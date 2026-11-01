@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sdk:
+    name: SDK unit tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile=false
+      - run: pnpm test:sdk
+
+  contracts:
+    name: Contracts (Rust stable)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/contracts
+      - name: Cargo test (all four contracts)
+        run: cargo test --manifest-path packages/contracts/Cargo.toml --workspace
+      - name: Cargo fmt check
+        run: cargo fmt --manifest-path packages/contracts/Cargo.toml --all -- --check
+      - name: Clippy
+        run: cargo clippy --manifest-path packages/contracts/Cargo.toml --workspace --all-targets -- -D warnings
+      - name: Build wasm (release, all contracts)
+        run: |
+          cargo build --manifest-path packages/contracts/Cargo.toml --workspace \
+            --target wasm32-unknown-unknown --release
+
+  sandbox:
+    name: Sandbox integration (mint, pack, list, buy, anti-drain)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile=false
+      - name: Build contract wasm files
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Compile contracts
+        run: |
+          cargo build --manifest-path packages/contracts/Cargo.toml --workspace \
+            --target wasm32-unknown-unknown --release
+          mkdir -p packages/sdk/wasm
+          for c in nft wallet marketplace mock-verifier; do
+            cp packages/contracts/target/wasm32-unknown-unknown/release/vessel_$c.wasm packages/sdk/wasm/ ||
+            cp packages/contracts/target/wasm32-unknown-unknown/release/$c.wasm packages/sdk/wasm/ || true
+          done
+      - name: Run sandbox tests (near-workspaces)
+        run: pnpm test:sandbox
+
+  web:
+    name: Web app build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile=false
+      - run: pnpm --filter @vessel/web run build

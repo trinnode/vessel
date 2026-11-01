@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 128" width="460" height="128" role="img" aria-label="Vessel wordmark">
+  <defs>
+    <linearGradient id="vsc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A2540"/>
+      <stop offset="1" stop-color="#050D1A"/>
+    </linearGradient>
+    <linearGradient id="vst" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00C8FF"/>
+      <stop offset="1" stop-color="#0077B6"/>
+    </linearGradient>
+    <linearGradient id="vss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8F4FA"/>
+      <stop offset="1" stop-color="#9FB8C9"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(0,0)">
+    <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#vsc)"/>
+    <rect x="4" y="4" width="120" height="120" rx="28" fill="none" stroke="url(#vst)" stroke-width="2" opacity="0.7"/>
+    <path d="M34 38 L34 66 A30 30 0 0 0 94 66 L94 38"
+          fill="none" stroke="url(#vst)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M52 92 L76 92" stroke="url(#vss)" stroke-width="7" stroke-linecap="round"/>
+    <rect x="44" y="42" width="40" height="6.5" rx="3.25" fill="url(#vss)"/>
+    <rect x="44" y="54" width="40" height="6.5" rx="3.25" fill="#00C8FF" opacity="0.85"/>
+    <rect x="44" y="66" width="40" height="6.5" rx="3.25" fill="url(#vss)" opacity="0.75"/>
+    <circle cx="98" cy="34" r="7" fill="#050D1A" stroke="#00C8FF" stroke-width="3"/>
+    <circle cx="98" cy="34" r="2.4" fill="#00C8FF"/>
+  </g>
+  <text x="148" y="72" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
+        font-size="44" font-weight="700" letter-spacing="10" fill="#F2F7FA">VESSEL</text>
+  <text x="152" y="98" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
+        font-size="12.5" letter-spacing="3.5" fill="#00C8FF">PACK A WALLET. SELL IT LIKE AN NFT.</text>
+</svg>

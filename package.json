@@ -1,0 +1,30 @@
+{
+  "name": "vessel-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vessel: the cross-chain portfolio NFT. Pack a wallet with assets from 35+ chains, sell it as one NEAR NFT transfer.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.27.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present run build",
+    "test": "pnpm -r --if-present run test",
+    "test:sdk": "pnpm --filter @vessel/sdk run test",
+    "test:sandbox": "pnpm --filter @vessel/sdk run test:sandbox",
+    "test:rust": "cargo test --manifest-path packages/contracts/Cargo.toml --workspace",
+    "lint": "pnpm -r --if-present run lint",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "build:contracts": "cd packages/contracts && bash ../../scripts/build-all.sh",
+    "deploy": "bash scripts/deploy.sh",
+    "dust-test": "bash scripts/dust-test.sh",
+    "dev": "pnpm --filter @vessel/web run dev",
+    "clean": "pnpm -r --if-present run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
