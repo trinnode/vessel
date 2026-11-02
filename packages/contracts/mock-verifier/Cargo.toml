@@ -1,0 +1,15 @@
+[package]
+name = "mock-verifier"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Sandbox-only stand-in for the NEAR Intents verifier (intents.near). Never deploy to mainnet."
+
+[lib]
+name = "mock_verifier"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

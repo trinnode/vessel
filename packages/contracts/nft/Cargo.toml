@@ -1,0 +1,16 @@
+[package]
+name = "nft"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Vessel NFT factory: NEP-171 tokens that own NEAR sub-account wallets"
+
+[lib]
+name = "nft"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = { workspace = true }
+near-contract-standards = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

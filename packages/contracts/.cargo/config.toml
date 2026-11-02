@@ -1,0 +1,6 @@
+# Keep the cargo target dir at the workspace root (packages/contracts/target).
+# The nft crate embeds the wallet wasm from
+# target/wasm32-unknown-unknown/release/wallet.wasm via include_bytes!.
+# scripts/build-all.sh builds the wallet first so the file exists before the
+# nft crate is compiled. Run `cargo clean` and rebuilds will fail for nft
+# until the wallet wasm is produced again.
