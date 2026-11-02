@@ -12,6 +12,7 @@
 //! - the verifier for custody of intents assets. Balances in intents.near
 //!   are not tracked here; withdrawal of those assets is a promise to the
 //!   verifier, which enforces its own authorization.
+//!
 //! It does NOT trust the marketplace directly: the marketplace never calls
 //! this contract, it goes through the factory. The recorded owner is only a
 //! mirror of the NFT owner pushed by the factory, so the wallet is
@@ -43,6 +44,7 @@ const VERIFIER_STORAGE_DEPOSIT: NearToken = NearToken::from_millinear(100);
 const ONE_YOCTO: NearToken = NearToken::from_yoctonear(1);
 
 #[ext_contract(ext_ft)]
+#[allow(dead_code)]
 trait FungibleToken {
     fn ft_transfer(
         &self,
@@ -53,6 +55,7 @@ trait FungibleToken {
 }
 
 #[ext_contract(ext_verifier)]
+#[allow(dead_code)]
 trait IntentsVerifier {
     fn mt_withdraw(
         &self,
@@ -310,6 +313,7 @@ impl VesselWallet {
     /// balance reduced; on failure the 1 yoctoNEAR that traveled with the
     /// ft_transfer is refunded to the owner.
     #[private]
+    #[allow(deprecated)]
     pub fn on_ft_withdrawn(
         &mut self,
         token_contract: AccountId,
@@ -331,7 +335,7 @@ impl VesselWallet {
 mod tests {
     use super::*;
     use near_sdk::test_utils::{accounts, VMContextBuilder};
-    use near_sdk::{testing_env, NearToken};
+    use near_sdk::testing_env;
 
     const FACTORY: usize = 3;
     const OWNER: usize = 0;
@@ -386,10 +390,9 @@ mod tests {
         w.set_listed(true);
         testing_env!(ctx(2, OWNER).build());
         let err = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            w.withdraw(format!("nep141:{}", WRAP), U128(1), accounts(1), None);
+            let _ = w.withdraw(format!("nep141:{}", WRAP), U128(1), accounts(1), None);
         }))
-        .err()
-        .expect("expected panic");
+        .expect_err("expected panic");
         assert!(err.downcast::<String>().unwrap().contains(PANIC_LISTED));
     }
 
@@ -414,7 +417,7 @@ mod tests {
     fn withdraw_rejects_non_owner() {
         let mut w = wallet();
         testing_env!(ctx(2, 1).build());
-        w.withdraw(format!("nep141:{}", WRAP), U128(1), accounts(1), None);
+        let _ = w.withdraw(format!("nep141:{}", WRAP), U128(1), accounts(1), None);
     }
 
     #[test]
@@ -458,8 +461,7 @@ mod tests {
         let err = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
             w.set_verifier(accounts(5));
         }))
-        .err()
-        .expect("expected panic");
+        .expect_err("expected panic");
         assert_eq!(
             *err.downcast::<String>().unwrap(),
             "Verifier already set for this wallet"
@@ -478,7 +480,7 @@ mod tests {
             .expect("query expected");
         assert_eq!(q.verifier, "intents.near".to_string());
         assert_eq!(q.method, "mt_balance_of");
-        assert!(q.args_json.contains("mt_balance_of") == false);
+        assert!(!q.args_json.contains("mt_balance_of"));
         assert!(q.args_json.contains(accounts(2).as_str()));
 
         // Unsupported prefix yields nothing.
@@ -492,10 +494,9 @@ mod tests {
         let mut w = wallet();
         testing_env!(ctx(2, OWNER).build());
         let err = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            w.withdraw("sol:abc".to_string(), U128(1), accounts(1), None);
+            let _ = w.withdraw("sol:abc".to_string(), U128(1), accounts(1), None);
         }))
-        .err()
-        .expect("expected panic");
+        .expect_err("expected panic");
         assert!(err
             .downcast::<String>()
             .unwrap()

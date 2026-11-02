@@ -14,6 +14,7 @@ pub struct Listing {
 }
 
 #[ext_contract(ext_nft)]
+#[allow(dead_code)]
 trait Nft {
     fn lock_for_sale(&mut self, token_id: String, seller_id: AccountId);
     fn unlock_from_sale(&mut self, token_id: String);
@@ -67,6 +68,7 @@ impl VesselMarketplace {
     }
 
     #[private]
+    #[allow(deprecated)]
     pub fn on_lock(&mut self, token_id: String) -> bool {
         require!(env::promise_results_count() == 1, "lock result missing");
         if !matches!(

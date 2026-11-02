@@ -26,6 +26,7 @@ pub struct TokenView {
 }
 
 #[ext_contract(ext_wallet)]
+#[allow(dead_code, clippy::new_ret_no_self, clippy::wrong_self_convention)]
 trait Wallet {
     fn new(&mut self, nft_contract: AccountId, token_id: String, owner_id: AccountId);
     fn owner_changed(&mut self, new_owner: AccountId);
@@ -125,7 +126,8 @@ impl VesselNft {
     }
 
     #[private]
-    pub fn on_mint(&mut self, token_id: String) -> bool {
+    #[allow(deprecated)]
+    pub fn on_mint(&mut self, _token_id: String) -> bool {
         require!(
             env::promise_results_count() == 1,
             "wallet initialization missing"
@@ -163,7 +165,7 @@ impl VesselNft {
         );
         self.listed.insert(&token_id, &true);
         if let Some(wallet) = self.wallets.get(&token_id) {
-            ext_wallet::ext(wallet.clone())
+            let _ = ext_wallet::ext(wallet.clone())
                 .with_static_gas(GAS_WALLET_INIT)
                 .set_listed(true);
         }
@@ -173,7 +175,7 @@ impl VesselNft {
         self.assert_marketplace();
         self.listed.insert(&token_id, &false);
         if let Some(wallet) = self.wallets.get(&token_id) {
-            ext_wallet::ext(wallet.clone())
+            let _ = ext_wallet::ext(wallet.clone())
                 .with_static_gas(GAS_WALLET_INIT)
                 .set_listed(false);
         }
@@ -188,10 +190,10 @@ impl VesselNft {
         self.owners.insert(&token_id, &receiver_id);
         self.listed.insert(&token_id, &false);
         if let Some(wallet) = self.wallets.get(&token_id) {
-            ext_wallet::ext(wallet.clone())
+            let _ = ext_wallet::ext(wallet.clone())
                 .with_static_gas(GAS_WALLET_INIT)
                 .set_listed(false);
-            ext_wallet::ext(wallet)
+            let _ = ext_wallet::ext(wallet)
                 .with_static_gas(GAS_WALLET_INIT)
                 .owner_changed(receiver_id);
         }
@@ -224,7 +226,7 @@ impl VesselNft {
         );
         self.owners.insert(&token_id.to_string(), receiver);
         if let Some(wallet) = self.wallets.get(&token_id.to_string()) {
-            ext_wallet::ext(wallet)
+            let _ = ext_wallet::ext(wallet)
                 .with_static_gas(GAS_WALLET_INIT)
                 .owner_changed(receiver.clone());
         }
